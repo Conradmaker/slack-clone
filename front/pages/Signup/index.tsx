@@ -11,9 +11,15 @@ import {
   LinkContainer,
   Success,
 } from './styles';
-import { Link } from 'react-router-dom';
+import { Link, RouteComponentProps } from 'react-router-dom';
+import fetcher from '../../utils/fetcher';
+import useSWR from 'swr';
 
-export default function Signup(): JSX.Element {
+export default function Signup({ history }: RouteComponentProps): JSX.Element {
+  const { data: userData } = useSWR(
+    'http://localhost:8000/api/users/',
+    fetcher
+  );
   const [email, onChangeEmail] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
   const [password, setPassword] = useState('');
@@ -54,6 +60,13 @@ export default function Signup(): JSX.Element {
     },
     [email, nickname, password, passwordCheck]
   );
+
+  if (userData) {
+    history.replace('/workspace/channel/1');
+  }
+  if (userData === undefined) {
+    return <div>로딩중</div>;
+  }
   return (
     <div id="container">
       <Header>Slack</Header>

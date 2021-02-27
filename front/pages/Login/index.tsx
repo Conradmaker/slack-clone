@@ -19,7 +19,7 @@ interface LoginPropsType extends RouteComponentProps {
 }
 
 export default function Login({ history }: LoginPropsType): JSX.Element {
-  const { data: userData, error, revalidate } = useSWR(
+  const { data: userData, error, mutate } = useSWR(
     'http://localhost:8000/api/users/',
     fetcher
   );
@@ -38,8 +38,9 @@ export default function Login({ history }: LoginPropsType): JSX.Element {
             withCredentials: true,
           }
         )
-        .then(() => {
-          revalidate();
+        .then(res => {
+          //서버로 요청을 보내지 않고 데이터를 업데이트
+          mutate(res.data);
         })
         .catch(e => {
           setLogInError(e.response?.data?.statusCode === 401);
@@ -49,7 +50,7 @@ export default function Login({ history }: LoginPropsType): JSX.Element {
   );
 
   if (!error && userData) {
-    history.replace('/workspace/sleact/channel/일반');
+    history.replace('/workspace/channel/일반');
   }
   return (
     <div id="container">
