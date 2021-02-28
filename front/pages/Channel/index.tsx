@@ -1,10 +1,13 @@
 import React from 'react';
 import Workspace from '../../layouts/Workspace';
+import { Container, Header } from './styles';
 
 export default function Channel(): JSX.Element {
   return (
     <Workspace>
-      <div>로그인을 축하해요</div>
+      <Container>
+        <Header>채널!</Header>
+      </Container>
     </Workspace>
   );
 }
