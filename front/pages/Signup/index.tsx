@@ -62,7 +62,7 @@ export default function Signup({ history }: RouteComponentProps): JSX.Element {
   );
 
   if (userData) {
-    history.replace('/workspace/channel/1');
+    history.replace('/workspace/name/channel/1');
   }
   if (userData === undefined) {
     return <div>로딩중</div>;

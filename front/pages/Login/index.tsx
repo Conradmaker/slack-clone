@@ -50,7 +50,7 @@ export default function Login({ history }: LoginPropsType): JSX.Element {
   );
 
   if (!error && userData) {
-    history.replace('/workspace/channel/일반');
+    history.replace('/workspace/react/channel/일반');
   }
   return (
     <div id="container">

@@ -12,8 +12,14 @@ const App: React.FC = () => {
         <Route exact path="/" render={() => <div>1</div>} />
         <Route path="/login" component={Login} />
         <Route path="/signup" component={Signup} />
-        <Route path="/workspace/channel/:name" component={Channel} />
-        <Route path="/workspace/dm/:name" component={DirectMessage} />
+        <Route
+          path="/workspace/:workspace/channel/:channel"
+          component={Channel}
+        />
+        <Route
+          path="/workspace/:workspace/dm/:user"
+          component={DirectMessage}
+        />
       </Suspense>
     </Switch>
   );

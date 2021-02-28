@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useCallback, useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import gravatar from 'gravatar';
 import fetcher from '../../utils/fetcher';
@@ -21,8 +21,9 @@ import {
   WorkspaceWrapper,
 } from './styles';
 import ContextMenu from '../../components/ContextMenu';
-import { IUser } from '../../types/db';
+import { IChannel, IUser } from '../../types/db';
 import CreateWSModal from './CreateWSModal';
+import CreateChannelModal from './CreateChannelModal';
 
 function isUserData(target: IUser | boolean): target is IUser {
   return (target as IUser)?.nickname !== undefined;
@@ -34,12 +35,25 @@ export default function Workspace({
   children,
 }: WorkspacePropTypes): JSX.Element {
   const history = useHistory();
+  const params = useParams<{ workspace: string; channel: string }>();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showWorkSpaceMenu, setShowWorkSpaceMenu] = useState(false);
   const [showCreateWSModal, setShowCreateWSModal] = useState(false);
+  const [showCreateChannelModal, setShowCreateChannelModal] = useState(false);
+
   const { data: userData, mutate, revalidate } = useSWR<IUser | boolean>(
     'http://localhost:8000/api/users/',
     fetcher
   );
+  const { data: channelData, revalidate: revalidateChannel } = useSWR<
+    IChannel[]
+  >(
+    userData
+      ? `http://localhost:8000/api/workspaces/${params.workspace}/channels`
+      : null,
+    fetcher
+  );
+
   const onLogout = useCallback(() => {
     axios
       .post('http://localhost:8000/api/users/logout', null, {
@@ -47,6 +61,7 @@ export default function Workspace({
       })
       .then(() => mutate(false));
   }, []);
+
   const onToggleUserProfile = useCallback(() => {
     setShowUserMenu(prev => !prev);
   }, [showUserMenu]);
@@ -54,6 +69,15 @@ export default function Workspace({
   const onToggleModal = useCallback(() => {
     setShowCreateWSModal(prev => !prev);
   }, [showCreateWSModal]);
+
+  const onToggleWorkspaceMenu = useCallback(() => {
+    setShowWorkSpaceMenu(prev => !prev);
+  }, [showWorkSpaceMenu]);
+
+  const onToggleCreateChannelModal = useCallback(() => {
+    setShowWorkSpaceMenu(false);
+    setShowCreateChannelModal(prev => !prev);
+  }, []);
 
   if (!userData) {
     history.replace('/login');
@@ -99,7 +123,7 @@ export default function Workspace({
       <WorkspaceWrapper>
         <Workspaces>
           {userData.Workspaces.map(v => (
-            <Link key={v.id} to={`/workspace/${v.id}/channel/일반`}>
+            <Link key={v.id} to={`/workspace/${v.name}/channel/일반`}>
               <WorkspaceButton>
                 {v.name.slice(0, 1).toUpperCase()}
               </WorkspaceButton>
@@ -108,17 +132,29 @@ export default function Workspace({
           <AddButton onClick={onToggleModal}>+</AddButton>
         </Workspaces>
         <Channels>
-          <WorkspaceName>react</WorkspaceName>
+          <WorkspaceName onClick={onToggleWorkspaceMenu}>
+            {params.workspace}
+          </WorkspaceName>
           <MenuScroll>
-            {/* <ContextMenu
-              show={showWorkspaceModal}
-              onCloseModal={toggleWorkspaceModal}
-              style={{ top: 95, left: 80 }}
-            >
-              <WorkspaceModal>
-                <h2>Slack</h2>
-              </WorkspaceModal>
-            </ContextMenu> */}
+            {showWorkSpaceMenu && (
+              <ContextMenu
+                onCloseModal={onToggleWorkspaceMenu}
+                style={{ top: 95, left: 80 }}
+                closeButton={true}
+              >
+                <WorkspaceModal>
+                  <h2>{params.workspace}</h2>
+                  <button>워크스페이스에 사용자 초대</button>
+                  <button onClick={onToggleCreateChannelModal}>
+                    채널 만들기
+                  </button>
+                  <button onClick={onLogout}>로그아웃</button>
+                </WorkspaceModal>
+              </ContextMenu>
+            )}
+            {channelData?.map(v => (
+              <div>{v.name}</div>
+            ))}
           </MenuScroll>
         </Channels>
         <Chats>{children}</Chats>
@@ -127,6 +163,11 @@ export default function Workspace({
         show={showCreateWSModal}
         onCloseModal={onToggleModal}
         revalidate={revalidate}
+      />
+      <CreateChannelModal
+        show={showCreateChannelModal}
+        onCloseModal={onToggleCreateChannelModal}
+        revalidate={revalidateChannel}
       />
     </div>
   );
