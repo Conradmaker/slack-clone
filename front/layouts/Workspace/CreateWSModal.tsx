@@ -24,14 +24,10 @@ export default function CreateWSModal({
       if (!newWorkSpace || !newWorkSpace.trim()) return;
       if (!newUrl || !newUrl.trim()) return;
       axios
-        .post(
-          'http://localhost:8000/api/workspaces',
-          {
-            workspace: newWorkSpace,
-            url: newUrl,
-          },
-          { withCredentials: true }
-        )
+        .post('/api/workspaces', {
+          workspace: newWorkSpace,
+          url: newUrl,
+        })
         .then(() => {
           revalidate();
           setNewWorkSpace('');

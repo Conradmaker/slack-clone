@@ -11,45 +11,49 @@ type CreateChannelPropTypes = {
   onCloseModal: () => void;
   revalidate: () => void;
 };
-export default function CreateChannelModal({
+export default function AddWSMemberModal({
   show,
   onCloseModal,
   revalidate,
 }: CreateChannelPropTypes): JSX.Element {
   const params = useParams<{ workspace: string; channel: string }>();
-  const [newChannel, onChangeNewChannel, setNewChannel] = useInput('');
-  const onCreateChannel = useCallback(
+  const [newMember, onChangeNewMember, setNewMember] = useInput('');
+  const onInviteMember = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      if (!newMember || !newMember.trim()) {
+        return;
+      }
       axios
-        .post(`/api/workspaces/${params.workspace}/channels`, {
-          name: newChannel,
+        .post(`/api/workspaces/${params.workspace}/members`, {
+          email: newMember,
         })
         .then(() => {
           revalidate();
           onCloseModal();
-          setNewChannel('');
+          setNewMember('');
         })
-        .catch(e => {
-          console.error(e);
-          toast.error(e.response.data, { position: 'bottom-center' });
+        .catch(error => {
+          console.dir(error);
+          toast.error(error.response?.data, { position: 'bottom-center' });
         });
     },
-    [newChannel]
+    [params.workspace, newMember]
   );
 
   return (
     <Modal show={show} onCloseModal={onCloseModal}>
-      <form onSubmit={onCreateChannel}>
-        <Label id="channel-label">
-          <span>워크스페이스 이름</span>
+      <form onSubmit={onInviteMember}>
+        <Label id="member-label">
+          <span>이메일</span>
           <Input
-            id="channel"
-            value={newChannel}
-            onChange={onChangeNewChannel}
+            id="member"
+            type="email"
+            value={newMember}
+            onChange={onChangeNewMember}
           />
         </Label>
-        <Button type="submit">생성하기</Button>
+        <Button type="submit">초대하기</Button>
       </form>
     </Modal>
   );

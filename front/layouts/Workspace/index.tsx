@@ -24,6 +24,10 @@ import ContextMenu from '../../components/ContextMenu';
 import { IChannel, IUser } from '../../types/db';
 import CreateWSModal from './CreateWSModal';
 import CreateChannelModal from './CreateChannelModal';
+import AddWSMemberModal from './AddWSMemberModal';
+import AddCHMemberModal from './AddCHMemberModal';
+import ChannelList from '../../components/ChannelList';
+import DMList from '../../components/DMList';
 
 function isUserData(target: IUser | boolean): target is IUser {
   return (target as IUser)?.nickname !== undefined;
@@ -39,27 +43,20 @@ export default function Workspace({
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showWorkSpaceMenu, setShowWorkSpaceMenu] = useState(false);
   const [showCreateWSModal, setShowCreateWSModal] = useState(false);
+  const [showAddWSMemberModal, setShowAddWSMemberModal] = useState(false);
+  const [showAddCHMemberModal, setShowAddCHMemberModal] = useState(false);
   const [showCreateChannelModal, setShowCreateChannelModal] = useState(false);
 
   const { data: userData, mutate, revalidate } = useSWR<IUser | boolean>(
-    'http://localhost:8000/api/users/',
+    '/api/users/',
     fetcher
   );
   const { data: channelData, revalidate: revalidateChannel } = useSWR<
     IChannel[]
-  >(
-    userData
-      ? `http://localhost:8000/api/workspaces/${params.workspace}/channels`
-      : null,
-    fetcher
-  );
+  >(userData ? `/api/workspaces/${params.workspace}/channels` : null, fetcher);
 
   const onLogout = useCallback(() => {
-    axios
-      .post('http://localhost:8000/api/users/logout', null, {
-        withCredentials: true,
-      })
-      .then(() => mutate(false));
+    axios.post('/api/users/logout', null).then(() => mutate(false));
   }, []);
 
   const onToggleUserProfile = useCallback(() => {
@@ -77,6 +74,15 @@ export default function Workspace({
   const onToggleCreateChannelModal = useCallback(() => {
     setShowWorkSpaceMenu(false);
     setShowCreateChannelModal(prev => !prev);
+  }, []);
+
+  const onToggleAddWSMemberModal = useCallback(() => {
+    setShowWorkSpaceMenu(false);
+    setShowAddWSMemberModal(prev => !prev);
+  }, []);
+  const onToggleAddCHMemberModal = useCallback(() => {
+    setShowWorkSpaceMenu(false);
+    setShowAddCHMemberModal(prev => !prev);
   }, []);
 
   if (!userData) {
@@ -122,7 +128,7 @@ export default function Workspace({
 
       <WorkspaceWrapper>
         <Workspaces>
-          {userData.Workspaces.map(v => (
+          {userData?.Workspaces?.map(v => (
             <Link key={v.id} to={`/workspace/${v.name}/channel/일반`}>
               <WorkspaceButton>
                 {v.name.slice(0, 1).toUpperCase()}
@@ -144,7 +150,9 @@ export default function Workspace({
               >
                 <WorkspaceModal>
                   <h2>{params.workspace}</h2>
-                  <button>워크스페이스에 사용자 초대</button>
+                  <button onClick={onToggleAddWSMemberModal}>
+                    워크스페이스에 사용자 초대
+                  </button>
                   <button onClick={onToggleCreateChannelModal}>
                     채널 만들기
                   </button>
@@ -152,9 +160,8 @@ export default function Workspace({
                 </WorkspaceModal>
               </ContextMenu>
             )}
-            {channelData?.map(v => (
-              <div>{v.name}</div>
-            ))}
+            <ChannelList userData={userData} channelData={channelData} />
+            <DMList userData={userData} />
           </MenuScroll>
         </Channels>
         <Chats>{children}</Chats>
@@ -167,6 +174,16 @@ export default function Workspace({
       <CreateChannelModal
         show={showCreateChannelModal}
         onCloseModal={onToggleCreateChannelModal}
+        revalidate={revalidateChannel}
+      />
+      <AddWSMemberModal
+        show={showAddWSMemberModal}
+        onCloseModal={onToggleAddWSMemberModal}
+        revalidate={revalidateChannel}
+      />
+      <AddCHMemberModal
+        show={showAddCHMemberModal}
+        onCloseModal={onToggleAddCHMemberModal}
         revalidate={revalidateChannel}
       />
     </div>

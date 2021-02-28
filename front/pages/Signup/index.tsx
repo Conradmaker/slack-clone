@@ -16,10 +16,7 @@ import fetcher from '../../utils/fetcher';
 import useSWR from 'swr';
 
 export default function Signup({ history }: RouteComponentProps): JSX.Element {
-  const { data: userData } = useSWR(
-    'http://localhost:8000/api/users/',
-    fetcher
-  );
+  const { data: userData } = useSWR('/api/users/', fetcher);
   const [email, onChangeEmail] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
   const [password, setPassword] = useState('');
@@ -49,7 +46,7 @@ export default function Signup({ history }: RouteComponentProps): JSX.Element {
       setSignUpSuccess(false);
       if (!mismatchError && nickname) {
         axios
-          .post<string>('http://localhost:8000/api/users', {
+          .post<string>('/api/users', {
             email,
             nickname,
             password,
