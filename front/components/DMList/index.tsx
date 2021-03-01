@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import useSWR from 'swr';
+import useSocket from '../../hooks/useSocket';
 import { IUser, IUserWithOnline } from '../../types/db';
 import fetcher from '../../utils/fetcher';
 import { CollapseButton } from './styles';
@@ -15,7 +16,7 @@ export default function DMList({ userData }: DMListPropTypes): JSX.Element {
     userData ? `/api/workspaces/${workspace}/members` : null,
     fetcher
   );
-  //   const [socket] = useSocket(workspace);
+  const [socket] = useSocket(workspace);
   const [channelCollapse, setChannelCollapse] = useState(false);
   const [countList, setCountList] = useState<{ [key: string]: number }>({});
   const [onlineList, setOnlineList] = useState<number[]>([]);
@@ -34,11 +35,19 @@ export default function DMList({ userData }: DMListPropTypes): JSX.Element {
     []
   );
   useEffect(() => {
-    console.log('DMList: workspace 바꼈다', workspace);
     setOnlineList([]);
     setCountList({});
   }, [workspace]);
-
+  useEffect(() => {
+    socket?.on('onlineList', data => {
+      setOnlineList(data);
+    });
+    // socket?.on('dm', onMessage); 연결했으면 정리도
+    return () => {
+      // socket?.off('dm', onMessage);
+      socket?.off('onlineList');
+    };
+  }, [socket]);
   return (
     <>
       <h2>

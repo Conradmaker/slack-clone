@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import gravatar from 'gravatar';
@@ -28,6 +28,7 @@ import AddWSMemberModal from './AddWSMemberModal';
 import AddCHMemberModal from './AddCHMemberModal';
 import ChannelList from '../../components/ChannelList';
 import DMList from '../../components/DMList';
+import useSocket from '../../hooks/useSocket';
 
 function isUserData(target: IUser | boolean): target is IUser {
   return (target as IUser)?.nickname !== undefined;
@@ -54,6 +55,22 @@ export default function Workspace({
   const { data: channelData, revalidate: revalidateChannel } = useSWR<
     IChannel[]
   >(userData ? `/api/workspaces/${params.workspace}/channels` : null, fetcher);
+
+  const [socket, disconnect] = useSocket(params.workspace);
+
+  useEffect(() => {
+    if (channelData && userData && socket) {
+      socket.emit('login', {
+        id: (userData as IUser).id,
+        channels: channelData.map(v => v.id),
+      });
+    }
+  }, [socket, channelData, userData]);
+  useEffect(() => {
+    return () => {
+      disconnect();
+    };
+  }, [params.workspace, disconnect]);
 
   const onLogout = useCallback(() => {
     axios.post('/api/users/logout', null).then(() => mutate(false));
