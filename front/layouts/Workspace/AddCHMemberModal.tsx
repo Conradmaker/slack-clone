@@ -27,10 +27,11 @@ export default function AddCHMemberModal({
   const [newMember, onChangeNewMember, setNewMember] = useInput('');
   const { data: userData } = useSWR<IUser>('/api/users', fetcher);
   const { revalidate: revalidateMembers } = useSWR<IUser[]>(
-    userData
+    userData && channel
       ? `/api/workspaces/${workspace}/channels/${channel}/members`
       : null,
-    fetcher
+    fetcher,
+    { refreshInterval: 30000 }
   );
 
   const onInviteMember = useCallback(

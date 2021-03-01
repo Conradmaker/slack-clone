@@ -17,7 +17,7 @@ const App: React.FC = () => {
           component={Channel}
         />
         <Route
-          path="/workspace/:workspace/dm/:user"
+          path="/workspace/:workspace/dm/:userId"
           component={DirectMessage}
         />
       </Suspense>

@@ -1,14 +1,10 @@
 import { useCallback, useState } from 'react';
-
+type Element = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
 const useInput = <T = string | number>(
   initialValue: T
-): [
-  T,
-  (event: React.ChangeEvent<HTMLInputElement>) => void,
-  React.Dispatch<T>
-] => {
+): [T, (event: Element) => void, React.Dispatch<T>] => {
   const [value, setValue] = useState(initialValue);
-  const handler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handler = useCallback((e: Element) => {
     setValue((e.target.value as unknown) as T);
   }, []);
   return [value, handler, setValue];
