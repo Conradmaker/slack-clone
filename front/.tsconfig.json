@@ -2,11 +2,7 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "sourceMap": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": [ "DOM","ESNext","ES2020","ES2019","ES2018","es2017"],
     "jsx": "react-jsx",
     "module": "esnext",
     "moduleResolution": "node",

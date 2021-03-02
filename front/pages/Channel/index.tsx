@@ -11,11 +11,12 @@ export default function Channel(): JSX.Element {
     e.preventDefault();
     setChat('');
   }, []);
+
   return (
     <Workspace>
       <Container>
         <Header>채널!</Header>
-        <ChatList />
+        <ChatList chatSections={{}} />
         <ChatBox chat={chat} onChangeChat={onChangeChat} onSubmit={onSubmit} />
       </Container>
     </Workspace>

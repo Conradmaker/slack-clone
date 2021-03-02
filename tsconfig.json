@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+      "esModuleInterop": true,
+      "sourceMap": true,
+      "lib": [ "DOM","ESNext","ES2020","ES2019","ES2018","es2017"],
+      "jsx": "react-jsx",
+      "module": "esnext",
+      "moduleResolution": "node",
+      "target": "es5",
+      "strict": true,
+      "resolveJsonModule": true,
+      "baseUrl": ".",
+      "paths": {
+        "@hooks/*": ["hooks/*"],
+        "@components/*": ["components/*"],
+        "@layouts/*": ["layouts/*"],
+        "@pages/*": ["pages/*"],
+        "@utils/*": ["utils/*"],
+        "@typings/*": ["typings/*"]
+      }
+    },
+    "exclude":["webpack.config.ts"]
+   
+  }
+  

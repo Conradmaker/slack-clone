@@ -33,7 +33,6 @@ export default function ChannelList({
     []
   );
   useEffect(() => {
-    console.log('ChannelList: workspace 바꼈다', workspace, location.pathname);
     setCountList({});
   }, [workspace, location]);
   return (

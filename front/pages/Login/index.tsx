@@ -19,7 +19,7 @@ interface LoginPropsType extends RouteComponentProps {
 }
 
 export default function Login({ history }: LoginPropsType): JSX.Element {
-  const { data: userData, error, mutate } = useSWR('/api/users/', fetcher);
+  const { data: userData, error, revalidate } = useSWR('/api/users/', fetcher);
   const [logInError, setLogInError] = useState(false);
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
@@ -31,7 +31,8 @@ export default function Login({ history }: LoginPropsType): JSX.Element {
         .post('/api/users/login', { email, password })
         .then(res => {
           //서버로 요청을 보내지 않고 데이터를 업데이트
-          mutate(res.data);
+          //mutate(res.data);
+          revalidate();
         })
         .catch(e => {
           setLogInError(e.response?.data?.statusCode === 401);

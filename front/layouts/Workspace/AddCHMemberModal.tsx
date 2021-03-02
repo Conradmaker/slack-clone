@@ -17,9 +17,7 @@ type AddCHMemberModalPropTypes = {
 export default function AddCHMemberModal({
   show,
   onCloseModal,
-  revalidate,
 }: AddCHMemberModalPropTypes): JSX.Element {
-  console.log(revalidate);
   const { workspace, channel } = useParams<{
     workspace: string;
     channel: string;

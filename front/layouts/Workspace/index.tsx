@@ -30,7 +30,7 @@ import ChannelList from '../../components/ChannelList';
 import DMList from '../../components/DMList';
 import useSocket from '../../hooks/useSocket';
 
-function isUserData(target: IUser | boolean): target is IUser {
+function isUserData(target: boolean | IUser | undefined): target is IUser {
   return (target as IUser)?.nickname !== undefined;
 }
 type WorkspacePropTypes = {
@@ -106,7 +106,7 @@ export default function Workspace({
     history.replace('/login');
   }
   if (!isUserData(userData)) {
-    return null;
+    return <div></div>;
   }
   return (
     <div>
