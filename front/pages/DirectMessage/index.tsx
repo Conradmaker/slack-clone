@@ -140,7 +140,7 @@ export default function DirectMessage(): JSX.Element {
         </Header>
         <ChatList
           chatSections={chatSections}
-          ref={scrollbarRef}
+          scrollbarRef={scrollbarRef}
           setSize={setSize}
           isReachingEnd={isReachingEnd}
           isEmpty={isEmpty}

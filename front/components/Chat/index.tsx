@@ -1,5 +1,5 @@
 import React, { useMemo, memo } from 'react';
-import { IDM } from '../../types/db';
+import { IChat, IDM } from '../../types/db';
 import { ChatWrapper } from './styles';
 import gravatar from 'gravatar';
 import dayjs from 'dayjs';
@@ -24,10 +24,10 @@ const makeContent = (data: string, workspace: string) =>
   });
 
 type ChatPropTypes = {
-  data: IDM;
+  data: IDM | IChat;
 };
 function Chat({ data }: ChatPropTypes): JSX.Element {
-  const user = data.Sender;
+  const user = 'Sender' in data ? data.Sender : data.User;
   const { workspace } = useParams<{ workspace: string }>();
 
   const result = useMemo(() => makeContent(data.content, workspace), [
