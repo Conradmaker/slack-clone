@@ -12,6 +12,8 @@ import useInput from '../../hooks/useInput';
 import axios from 'axios';
 import makeSection from '../../utils/makeSection';
 import Scrollbars from 'react-custom-scrollbars';
+import { toast } from 'react-toastify';
+import useSocket from '../../hooks/useSocket';
 
 export default function DirectMessage(): JSX.Element {
   const scrollbarRef = useRef<Scrollbars>(null);
@@ -20,6 +22,7 @@ export default function DirectMessage(): JSX.Element {
     workspace: string;
     userId: string;
   }>();
+  const [socket] = useSocket(workspace);
 
   //setSize는 페이지수를 바꾼다.
   const {
@@ -76,6 +79,43 @@ export default function DirectMessage(): JSX.Element {
     },
     [chat, workspace, userId, myData, userData, chatData]
   );
+
+  const onMessage = (data: IDM) => {
+    if (
+      data.SenderId === Number(userId) &&
+      (myData as IUser).id !== Number(userId)
+    ) {
+      mutateChat(chatData => {
+        chatData?.[0].unshift(data);
+        return chatData;
+      }, false).then(() => {
+        if (scrollbarRef.current) {
+          if (
+            scrollbarRef.current.getScrollHeight() <
+            scrollbarRef.current.getClientHeight() +
+              scrollbarRef.current.getScrollTop() +
+              150
+          ) {
+            console.log('scrollToBottom!', scrollbarRef.current?.getValues());
+            scrollbarRef.current.scrollToBottom();
+          } else {
+            toast.success('새 메시지가 도착했습니다.', {
+              onClick() {
+                scrollbarRef.current?.scrollToBottom();
+              },
+              closeOnClick: true,
+            });
+          }
+        }
+      });
+    }
+  };
+  useEffect(() => {
+    socket?.on('dm', onMessage);
+    return () => {
+      socket?.off('dm', onMessage);
+    };
+  }, [socket, userId, myData]);
   useEffect(() => {
     if (chatData?.length === 1) {
       scrollbarRef.current?.scrollToBottom();

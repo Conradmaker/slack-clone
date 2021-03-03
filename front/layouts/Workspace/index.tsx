@@ -114,7 +114,7 @@ export default function Workspace({
         <RightMenu>
           <span onClick={onToggleUserProfile}>
             <ProfileImg
-              src={gravatar.url(userData.nickname, { s: '28px', d: 'retro' })}
+              src={gravatar.url(userData.email, { s: '28px', d: 'retro' })}
               alt={userData.nickname}
             />
           </span>
