@@ -19,7 +19,6 @@
         "@typings/*": ["typings/*"]
       }
     },
-    "exclude":["webpack.config.ts"]
-   
+    "exclude":["/front/webpack.config.ts"]
   }
   
