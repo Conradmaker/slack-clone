@@ -1,5 +1,6 @@
-import nodeExternals from 'webpack-node-externals';
-import { RunScriptWebpackPlugin } from 'run-script-webpack-plugin';
+/* eslint-disable @typescript-eslint/no-var-requires */
+const nodeExternals = require('webpack-node-externals');
+const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
 
 module.exports = function (options, webpack) {
   return {
